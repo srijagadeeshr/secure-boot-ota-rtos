@@ -1,44 +1,65 @@
-# secure-boot-ota-rtos
-
-Secure Bootloader with OTA Update using RTOS and Cryptography
-
-\# Project Status: In Progress
-
-
-
 ## Overview
 
-This project implements a secure bootloader supporting OTA firmware updates with cryptographic verification and rollback protection.
+This project implements a secure bootloader with OTA firmware update capability, designed to simulate an automotive ECU firmware update system with strong security guarantees.
 
+The system ensures that only authenticated firmware is executed, while supporting safe and reliable remote updates with rollback protection.
 
+---
 
 ## Key Features
 
-* Secure boot using signature verification (RSA/SHA)
-* OTA firmware update with rollback support
-* RTOS-based task handling
-* Flash memory partitioning
-* Python-based firmware signing tool
+* Secure Boot using cryptographic signature verification (RSA/SHA256 – mock implementation)
+* OTA firmware update with dual-partition strategy
+* Fail-safe rollback mechanism
+* RTOS-based task handling for OTA workflow
+* Flash memory partitioning (Bootloader, Primary, Secondary)
+* Python-based firmware signing tool (simulated)
 
+---
 
-
-## Boot Flow
+## Boot Flow (Secure Boot)
 
 1. System Power ON
-2. Bootloader initializes memory and peripherals
-3. Firmware signature verification
-4. Jump to application if valid
-5. OTA update if new firmware available
-6. Rollback if update fails
+2. Bootloader execution starts
+3. Firmware image is read from flash
+4. Hash (SHA256) is computed
+5. Signature verification is performed
+6. If valid → Jump to application
+7. If invalid → Stay in bootloader / recovery mode
 
+---
 
+## OTA Update Flow
 
-## Folder Structure
+1. Firmware is received in chunks
+2. Stored in secondary partition
+3. Integrity check is performed
+4. Signature verification is done
+5. Firmware marked as valid
+6. On next reboot → switch to new firmware
 
-* bootloader/ ? startup, linker, verification
-* ota\_update/ ? update logic
-* crypto/ ? cryptographic functions
-* rtos/ ? task scheduling
-* drivers/ ? hardware interfaces
-* tools/ ? signing scripts
+---
 
+## Memory Layout
+
+* Bootloader Region (Read-only)
+* Primary Application (Active firmware)
+* Secondary Application (OTA update region)
+
+---
+
+## Security Considerations
+
+* Prevent execution of unauthorized firmware
+* Protect against corrupted OTA updates
+* Ensure rollback to last known good image
+* Simulated cryptographic validation (extendable to HSM)
+
+---
+
+## Future Enhancements
+
+* Integration with real crypto libraries (mbedTLS)
+* Hardware Security Module (HSM) support
+* UDS/CAN-based OTA communication
+* AUTOSAR integration
