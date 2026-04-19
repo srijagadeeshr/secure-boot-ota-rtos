@@ -17,6 +17,15 @@ The system ensures that only authenticated firmware is executed, while supportin
 
 ---
 
+## Architecture Summary
+
+* Bootloader handles secure boot and partition selection
+* OTA manager handles firmware update lifecycle
+* Security module performs hash and signature verification
+* Platform layer defines memory layout
+
+---
+
 ## Boot Flow (Secure Boot)
 
 1. System Power ON
@@ -79,14 +88,6 @@ The system ensures that only authenticated firmware is executed, while supportin
 
 ---
 
-## Key Highlights
-
-* A/B OTA strategy
-* Secure boot validation
-* Rollback + trial boot
-
----
-
 ## Failure Handling
 
 * Power loss
@@ -100,6 +101,22 @@ The system ensures that only authenticated firmware is executed, while supportin
 * Secure boot with signature verification
 * Trial boot with firmware confirmation
 * Rollback mechanism for reliability
+
+---
+
+## Limitations
+
+- Cryptographic operations are mocked for demonstration
+- No real hardware flash interaction implemented
+
+---
+
+## Key Design Decisions
+
+- A/B partitioning for safe OTA updates
+- Verification before activation to prevent corrupted firmware execution
+- Trial boot with confirmation to avoid permanent faulty firmware
+- Rollback mechanism to ensure system reliability
 
 ---
 
