@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "../platform/memory_map.h"
+#include "../utils/log.h"
 
 #define FW_SIZE 1024
 
@@ -16,6 +17,10 @@ typedef enum {
     PARTITION_SECONDARY
 } partition_t;
 
+// NOTE:
+// In real embedded systems, OTA state, active partition,
+// and firmware confirmation flags must be stored in non-volatile memory
+// (Flash/EEPROM) to survive power cycles.
 partition_t active_partition = PARTITION_PRIMARY;
 
 void decide_boot_partition() {

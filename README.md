@@ -6,6 +6,10 @@ The system ensures that only authenticated firmware is executed, while supportin
 
 ---
 
+Bootloader → Verify → Select Partition → Jump
+          ↑
+        OTA Update → Secondary → Verify → Confirm
+
 ## Key Features
 
 * Secure Boot using cryptographic signature verification (RSA/SHA256 – mock implementation)
@@ -57,7 +61,6 @@ The system ensures that only authenticated firmware is executed, while supportin
 
 ---
 
-
 ## Failure handling 
 
 * Power loss during OTA
@@ -66,11 +69,28 @@ The system ensures that only authenticated firmware is executed, while supportin
 
 ---
 
-
 ## Threat Model
 * Replay attack
 * Downgrade attack
 * Unauthorized firmware
+
+---
+
+## How to Run
+
+- Compile using GCC (optional)
+- Run main.c to simulate boot + OTA flow
+
+---
+
+## Key Design Highlights
+
+- A/B partition OTA strategy
+- Secure boot with signature verification
+- Trial boot with firmware confirmation
+- Rollback mechanism for reliability
+
+---
 
 ## Future Enhancements
 

@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include "../platform/memory_map.h"
+#include "../utils/log.h"
 
 int retry_count = 0;
 #define MAX_RETRIES 3
+uint32_t current_version = 2;
+uint32_t new_version = 1;
 
 typedef enum {
     PARTITION_PRIMARY,
@@ -34,13 +37,17 @@ typedef struct {
 } firmware_metadata_t;
 
 firmware_metadata_t new_fw;
-// In real system, this should be stored in non-volatile memory (Flash / EEPROM)
+// NOTE:
+// In real embedded systems, OTA state, active partition,
+// and firmware confirmation flags must be stored in non-volatile memory
+// (Flash/EEPROM) to survive power cycles.
 ota_state_t ota_state = OTA_IDLE;
 extern bool secure_boot_verify();
 
 void rollback_to_previous() {
-    printf("[OTA] Rolling back to previous firmware...\n");
-	printf("[OTA] Booting from address: 0x%X\n", APP_PRIMARY_START);
+   // printf("[OTA] Rolling back to previous firmware...\n");
+	//printf("[OTA] Booting from address: 0x%X\n", APP_PRIMARY_START);
+	LOG_OTA([OTA] Booting from address: 0x%X\n,APP_PRIMARY_START)
 	}
 
 void ota_process() {
@@ -65,6 +72,10 @@ void ota_process() {
         case OTA_VERIFYING:
 			printf("[OTA] Validating firmware before activation...\n");
 
+			if (new_version <= current_version) {
+				printf("[SECURITY] Rejecting downgrade attack\n");
+				ota_state = OTA_FAILED;
+			}
 			if (secure_boot_verify()) {
 				new_firmware_status = FW_VALID;
 				ota_state = OTA_SUCCESS;
