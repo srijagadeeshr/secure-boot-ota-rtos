@@ -1,0 +1,15 @@
+#ifndef MEMORY_MAP_H
+#define MEMORY_MAP_H
+
+// Flash Memory Layout (Example)
+
+#define BOOTLOADER_START   0x00000000
+#define BOOTLOADER_SIZE    0x00010000
+
+#define APP_PRIMARY_START  0x00010000
+#define APP_PRIMARY_SIZE   0x00040000
+
+#define APP_SECONDARY_START 0x00050000
+#define APP_SECONDARY_SIZE  0x00040000
+
+#endif
