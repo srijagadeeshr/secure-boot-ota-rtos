@@ -1,4 +1,15 @@
 #include <stdio.h>
+#include "../platform/memory_map.h"
+
+int retry_count = 0;
+#define MAX_RETRIES 3
+
+typedef enum {
+    PARTITION_PRIMARY,
+    PARTITION_SECONDARY
+} partition_t;
+
+partition_t active_partition = PARTITION_PRIMARY;
 
 typedef enum {
     FW_VALID,
@@ -15,30 +26,42 @@ typedef enum {
     OTA_FAILED
 } ota_state_t;
 
+typedef struct {
+    uint32_t version;
+    uint32_t size;
+    uint8_t signature[64];
+} firmware_metadata_t;
+
+firmware_metadata_t new_fw;
 ota_state_t ota_state = OTA_IDLE;
 extern bool secure_boot_verify();
 
 void rollback_to_previous() {
     printf("[OTA] Rolling back to previous firmware...\n");
-
-    // Simulate switching back to primary partition
-    printf("[OTA] Booting from PRIMARY partition\n");
-}
+	printf("[OTA] Booting from address: 0x%X\n", APP_PRIMARY_START);
+	}
 
 void ota_process() {
+	//IDLE → DOWNLOADING → VERIFYING (secure boot)→ SUCCESS(switch partition)/FAILED( retry → rollback)
     switch (ota_state) {
 
         case OTA_IDLE:
             printf("[OTA] Idle state\n");
+			ota_state = OTA_DOWNLOADING;
             break;
 
         case OTA_DOWNLOADING:
             printf("[OTA] Downloading firmware...\n");
-            ota_state = OTA_VERIFYING;
+			// Simulate download completion
+			int download_complete = 1;
+
+			if (download_complete) {
+				ota_state = OTA_VERIFYING;
+			}
             break;
 
         case OTA_VERIFYING:
-			printf("[OTA] Verifying firmware...\n");
+			printf("[OTA] Validating firmware before activation...\n");
 
 			if (secure_boot_verify()) {
 				new_firmware_status = FW_VALID;
@@ -52,12 +75,19 @@ void ota_process() {
 
         case OTA_SUCCESS:
             printf("[OTA] Update successful!\n");
+			active_partition = PARTITION_SECONDARY;
 			printf("[OTA] Switching to SECONDARY partition\n");
             break;
 
         case OTA_FAILED:
-            printf("[OTA] Update failed!\n");
-			rollback_to_previous();
-            break;
+			retry_count++;
+
+			if (retry_count < MAX_RETRIES) {
+				printf("[OTA] Retry OTA...\n");
+				ota_state = OTA_DOWNLOADING;
+			} else {
+				rollback_to_previous();
+			}
+			break;
     }
 }

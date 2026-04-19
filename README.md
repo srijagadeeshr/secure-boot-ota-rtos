@@ -57,6 +57,21 @@ The system ensures that only authenticated firmware is executed, while supportin
 
 ---
 
+
+## Failure handling 
+
+* Power loss during OTA
+* Partial firmware write
+* Invalid firmware
+
+---
+
+
+## Threat Model
+* Replay attack
+* Downgrade attack
+* Unauthorized firmware
+
 ## Future Enhancements
 
 * Integration with real crypto libraries (mbedTLS)
