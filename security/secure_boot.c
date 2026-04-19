@@ -11,13 +11,29 @@ uint8_t signature[64];
 extern void compute_sha256(uint8_t *data, uint32_t size, uint8_t *hash);
 extern bool verify_signature(uint8_t *hash, uint8_t *signature);
 
-printf("Primary App at: 0x%X\n", APP_PRIMARY_START);
+typedef enum {
+    PARTITION_PRIMARY,
+    PARTITION_SECONDARY
+} partition_t;
 
+partition_t active_partition = PARTITION_PRIMARY;
+
+void decide_boot_partition() {
+    if (active_partition == PARTITION_SECONDARY) {
+        printf("[BOOT] Booting from SECONDARY partition\n");
+    } else {
+        printf("[BOOT] Booting from PRIMARY partition\n");
+    }
+}
+
+// NOTE:
+// In real systems, active_partition should be stored in non-volatile memory (Flash/EEPROM)
+// so bootloader can read it after reset.
 bool secure_boot_verify() {
     uint8_t hash[32];
 
     printf("[BOOT] Starting Secure Boot Verification...\n");
-
+	decide_boot_partition();
     compute_sha256(firmware, FW_SIZE, hash);
 
     if (!verify_signature(hash, signature)) {

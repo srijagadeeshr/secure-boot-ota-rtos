@@ -9,6 +9,7 @@ typedef enum {
     PARTITION_SECONDARY
 } partition_t;
 
+// In real system, this should be stored in non-volatile memory (Flash / EEPROM)
 partition_t active_partition = PARTITION_PRIMARY;
 
 typedef enum {
@@ -33,6 +34,7 @@ typedef struct {
 } firmware_metadata_t;
 
 firmware_metadata_t new_fw;
+// In real system, this should be stored in non-volatile memory (Flash / EEPROM)
 ota_state_t ota_state = OTA_IDLE;
 extern bool secure_boot_verify();
 
